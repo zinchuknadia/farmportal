@@ -1,32 +1,20 @@
-import { useEffect, useState } from "react";
-import "./styles/App.css"; // make sure to import your CSS
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import ProductsPage from "./pages/ProductsPage";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err));
-  }, []);
-
   return (
-    <div className="app">
-      <h1>FarmPortal Products</h1>
-      {products.length === 0 ? (
-        <p>Loading products...</p>
-      ) : (
-        <ul className="product-list">
-          {products.map((p) => (
-            <li key={p.id} className="product-card">
-              <h2>{p.name}</h2>
-              <p>Price: ${p.price}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Routes>
+    </Router>
   );
 }
 
