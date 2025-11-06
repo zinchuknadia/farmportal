@@ -1,0 +1,35 @@
+.products {
+  padding: 2rem;
+  text-align: center;
+}
+
+.products__title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+}
+
+.products__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background-color: #f8f8f8;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+.product__price {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #27ae60;
+}
