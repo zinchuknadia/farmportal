@@ -1,0 +1,33 @@
+.about {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 4rem 2rem;
+  background-color: #f8f9f5;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+}
+
+.about-content {
+  max-width: 800px;
+  text-align: center;
+}
+
+.about-content h1 {
+  font-size: 2.5rem;
+  color: #3c5a3c;
+  margin-bottom: 1rem;
+}
+
+.about-content h2 {
+  font-size: 1.8rem;
+  color: #527852;
+  margin-top: 2rem;
+}
+
+.about-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0.8rem 0;
+}

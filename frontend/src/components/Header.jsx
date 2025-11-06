@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../styles/Header.css";
 
 function Header() {
@@ -6,10 +7,12 @@ function Header() {
     <header className="header">
       <div className="header__logo">🌾 GreenFarm</div>
       <nav className="header__nav">
-        <a href="/" className="nav__link">Головна</a>
-        <a href="/about" className="nav__link">Про нас</a>
-        <a href="/products" className="nav__link">Продукція</a>
-        <a href="/contact" className="nav__link">Контакти</a>
+        <ul>
+          <li><Link to="/" className="nav__link">Home</Link></li>
+          <li><Link to="/about" className="nav__link">About</Link></li>
+          <li><Link to="/products" className="nav__link">Products</Link></li>
+          <li><Link to="/contact" className="nav__link">Contacts</Link></li>
+        </ul>
       </nav>
       <button className="header__button">Купити зараз</button>
     </header>
