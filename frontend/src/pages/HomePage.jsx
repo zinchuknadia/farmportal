@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/HomePage.css";
+import "../styles/index.css";
 
 function HomePage() {
   return (
@@ -16,7 +17,9 @@ function HomePage() {
               Органічна ферма, де кожен продукт вирощено з любов’ю до природи.  
               Ми дбаємо про здоров’я людей і чистоту навколишнього середовища.
             </p>
-            <button className="hero__button">Дізнатися більше</button>
+            <a href="/about">
+              <button className="hero__button">Дізнатися більше</button>
+            </a>
           </div>
         </section>
 
