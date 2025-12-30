@@ -34,9 +34,9 @@ function Header() {
           </li>
         </ul>
       </nav>
-      <a href="/profile">
+      <Link to="/profile">
         <button className="header__button">Купити зараз</button>
-      </a>
+      </Link>
       <Link to="/cart" className="cart-icon">
         🛒
         {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}

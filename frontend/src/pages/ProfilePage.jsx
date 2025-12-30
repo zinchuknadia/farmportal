@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useOrders } from "../context/OrdersContext";
+import { useUserPreferences } from "../context/UserPreferencesContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/ProfilePage.css";
 
 function ProfilePage() {
+  const { liked, saved } = useUserPreferences();
   const [activeTab, setActiveTab] = useState("orders");
   const { orders } = useOrders();
 
@@ -78,16 +80,36 @@ function ProfilePage() {
         );
   
       case "favorites":
+        if (liked.length === 0) {
+          return <div className="tab-content">No liked products yet.</div>;
+        }
+      
         return (
-          <div className="tab-content">
-            <p>You haven’t liked any products yet.</p>
+          <div className="orders-list">
+            {liked.map(product => (
+              <div key={product.id} className="order-card">
+                <strong>{product.name}</strong>
+                <p>{product.price} ₴ / {product.unit}</p>
+              </div>
+            ))}
           </div>
-        );
+        );        
   
       case "saved":
+        if (saved.length === 0) {
+          return <div className="tab-content">No saved products.</div>;
+        }
+      
         return (
-          <div className="tab-content">
-            <p>No saved products.</p>
+          <div className="orders-list">
+            {saved.map(product => (
+              <div key={product.id} className="order-card">
+                <strong>{product.name}</strong>
+                {product.preorder && (
+                  <p>🌱 Available from {product.availableFrom}</p>
+                )}
+              </div>
+            ))}
           </div>
         );
   

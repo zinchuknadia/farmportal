@@ -1,39 +1,56 @@
 import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useUserPreferences } from "../context/UserPreferencesContext";
 import "../styles/ProductCard.css";
 
 function ProductCard({ product }) {
-  const { dispatch } = useCart();
-  const [liked, setLiked] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const { dispatch: cartDispatch } = useCart();
+  const {
+    dispatch: prefDispatch,
+    liked,
+    saved
+  } = useUserPreferences();
+
+  const isLiked = liked.some(p => p.id === product.id);
+  const isSaved = saved.some(p => p.id === product.id);
 
   const addToCart = () => {
-    dispatch({
+    cartDispatch({
       type: "ADD_ITEM",
       payload: {
         ...product,
-        quantity: 1
-      }
+        quantity: 1,
+      },
     });
   };
 
   return (
-    <div className="product-card">
+     <div className="product-card">
       <div className="product-card__icons">
-        <button
-          className={liked ? "active" : ""}
-          onClick={() => setLiked(!liked)}
-          title="Like"
-        >
-          ❤️
-        </button>
-        <button
-          className={saved ? "active" : ""}
-          onClick={() => setSaved(!saved)}
-          title="Save"
-        >
-          🔖
-        </button>
+      <button
+        className={isLiked ? "active" : ""}
+        onClick={() =>
+          prefDispatch({
+            type: isLiked ? "REMOVE_LIKE" : "ADD_LIKE",
+            payload: isLiked ? product.id : product
+          })
+        }
+      >
+        ❤️
+      </button>
+
+      <button
+        className={isSaved ? "active" : ""}
+        onClick={() =>
+          prefDispatch({
+            type: isSaved ? "REMOVE_SAVE" : "ADD_SAVE",
+            payload: isSaved ? product.id : product
+          })
+        }
+      >
+        🔖
+      </button>
+
       </div>
 
       <img

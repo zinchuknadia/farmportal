@@ -32,6 +32,10 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+.product-card__icons button.active {
+  transform: scale(1.15);
+}
+
 .product-card__icons .active {
   background-color: #27ae60;
   color: white;
