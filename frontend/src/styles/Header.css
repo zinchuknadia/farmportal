@@ -66,3 +66,45 @@
     gap: 1rem;
   }
 }
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.cart-icon {
+  position: relative;
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
+.profile-icon {
+  font-size: 1.6rem;
+  text-decoration: none;
+}
+
+.profile-icon img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #2f5d31;
+  cursor: pointer;
+  font-weight: 500;
+}

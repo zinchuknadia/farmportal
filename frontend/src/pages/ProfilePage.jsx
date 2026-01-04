@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import { useOrders } from "../context/OrdersContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import Header from "../components/Header";
@@ -9,6 +12,30 @@ function ProfilePage() {
   const { liked, saved } = useUserPreferences();
   const [activeTab, setActiveTab] = useState("orders");
   const { orders } = useOrders();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchProfile = async () => {
+      try {
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setProfile(snap.data());
+        }
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -20,45 +47,41 @@ function ProfilePage() {
             </div>
           );
         }
-  
+
         return (
           <div className="orders-list">
-            {orders.map(order => (
+            {orders.map((order) => (
               <div key={order.id} className="order-card">
                 <div className="order-header">
                   <span>Order #{order.id.slice(0, 8)}</span>
                   <span className="order-status">{order.status}</span>
                 </div>
-  
+
                 <div className="order-items">
-                  {order.items.map(item => (
+                  {order.items.map((item) => (
                     <div key={item.id} className="order-item">
                       <span>
                         {item.name} × {item.quantity} {item.unit}
                       </span>
-                      <span>
-                        {(item.price * item.quantity).toFixed(2)} ₴
-                      </span>
+                      <span>{(item.price * item.quantity).toFixed(2)} ₴</span>
                     </div>
                   ))}
                 </div>
-  
+
                 <div className="order-footer">
-                  <span>
-                    Delivery date: {order.delivery.date}
-                  </span>
+                  <span>Delivery date: {order.delivery.date}</span>
                   <strong>Total: {order.total.toFixed(2)} ₴</strong>
                 </div>
               </div>
             ))}
           </div>
         );
-  
+
       case "preorders":
-        const preorderItems = orders.flatMap(order =>
-          order.items.filter(item => item.preorder)
+        const preorderItems = orders.flatMap((order) =>
+          order.items.filter((item) => item.preorder)
         );
-  
+
         if (preorderItems.length === 0) {
           return (
             <div className="tab-content">
@@ -66,10 +89,10 @@ function ProfilePage() {
             </div>
           );
         }
-  
+
         return (
           <div className="orders-list">
-            {preorderItems.map(item => (
+            {preorderItems.map((item) => (
               <div key={item.id} className="order-card">
                 <p>
                   🌱 {item.name} – ready on {item.deliveryDate}
@@ -78,31 +101,33 @@ function ProfilePage() {
             ))}
           </div>
         );
-  
+
       case "favorites":
         if (liked.length === 0) {
           return <div className="tab-content">No liked products yet.</div>;
         }
-      
+
         return (
           <div className="orders-list">
-            {liked.map(product => (
+            {liked.map((product) => (
               <div key={product.id} className="order-card">
                 <strong>{product.name}</strong>
-                <p>{product.price} ₴ / {product.unit}</p>
+                <p>
+                  {product.price} ₴ / {product.unit}
+                </p>
               </div>
             ))}
           </div>
-        );        
-  
+        );
+
       case "saved":
         if (saved.length === 0) {
           return <div className="tab-content">No saved products.</div>;
         }
-      
+
         return (
           <div className="orders-list">
-            {saved.map(product => (
+            {saved.map((product) => (
               <div key={product.id} className="order-card">
                 <strong>{product.name}</strong>
                 {product.preorder && (
@@ -112,11 +137,11 @@ function ProfilePage() {
             ))}
           </div>
         );
-  
+
       default:
         return null;
     }
-  };  
+  };
 
   return (
     <>
@@ -128,11 +153,20 @@ function ProfilePage() {
         {/* Personal info */}
         <div className="profile-info">
           <div className="profile-avatar">👩‍🌾</div>
+
           <div className="profile-details">
-            <h2>Nadiia Ivanenko</h2>
-            <p>Email: nadiia@example.com</p>
-            <p>Phone: +380 67 123 45 67</p>
-            <p>Delivery address: Lviv region, Ukraine</p>
+            {loadingProfile ? (
+              <p>Loading profile...</p>
+            ) : profile ? (
+              <>
+                <h2>{profile.name || "Unnamed user"}</h2>
+                <p>Email: {profile.email}</p>
+                <p>Phone: {profile.phone || "Not provided"}</p>
+                <p>Delivery address: {profile.address || "Not provided"}</p>
+              </>
+            ) : (
+              <p>No profile data found.</p>
+            )}
           </div>
         </div>
 
@@ -165,9 +199,7 @@ function ProfilePage() {
         </div>
 
         {/* Tab content */}
-        <div className="profile-tab-box">
-          {renderTabContent()}
-        </div>
+        <div className="profile-tab-box">{renderTabContent()}</div>
       </div>
 
       <Footer />
