@@ -2,11 +2,25 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
-import products from "../data/products";
+import { useProducts } from "../context/ProductsContext";
 import "../styles/ProductsPage.css";
 import "../styles/index.css";
 
 function ProductsPage() {
+  const { products, loading } = useProducts();
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <p style={{ textAlign: "center", marginTop: 40 }}>
+          Loading products...
+        </p>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />

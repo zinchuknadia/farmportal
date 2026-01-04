@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../context/AuthContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
@@ -7,6 +11,7 @@ import "../styles/CheckoutPage.css";
 import "../styles/index.css";
 
 function CheckoutPage() {
+  const { user } = useAuth();
   const { cart, dispatch: cartDispatch } = useCart();
   const { dispatch: ordersDispatch } = useOrders();
 
@@ -17,8 +22,41 @@ function CheckoutPage() {
     deliveryType: "pickup",
     address: "",
     deliveryDate: "",
-    comment: ""
+    comment: "",
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadUserProfile = async () => {
+      try {
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+
+          setForm((prev) => ({
+            ...prev,
+            name: data.name || "",
+            phone: data.phone || "",
+            email: data.email || user.email || "",
+            address: data.address || "",
+          }));
+        } else {
+          // fallback if user doc doesn't exist yet
+          setForm((prev) => ({
+            ...prev,
+            email: user.email || "",
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to load user data:", err);
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
 
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -29,8 +67,13 @@ function CheckoutPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user) {
+      alert("Please log in to place an order");
+      return;
+    }
 
     if (!form.name || !form.phone || !form.deliveryDate) {
       alert("Please fill all required fields");
@@ -38,28 +81,33 @@ function CheckoutPage() {
     }
 
     const order = {
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+      userId: user.uid,
+      createdAt: serverTimestamp(),
+      status: "pending",
       customer: {
         name: form.name,
         phone: form.phone,
-        email: form.email
+        email: form.email,
       },
       delivery: {
         type: form.deliveryType,
         address: form.deliveryType === "delivery" ? form.address : null,
-        date: form.deliveryDate
+        date: form.deliveryDate,
       },
       items: cart,
       total: subtotal,
-      status: "Pending"
     };
 
-    ordersDispatch({ type: "ADD_ORDER", payload: order });
-    cartDispatch({ type: "CLEAR_CART" });
+    try {
+      await addDoc(collection(db, "orders"), order);
 
-    alert("Order confirmed 🌱");
-    window.location.href = "/profile";
+      cartDispatch({ type: "CLEAR_CART" });
+      alert("Order confirmed 🌱");
+      window.location.href = "/profile";
+    } catch (err) {
+      console.error("Failed to save order:", err);
+      alert("Failed to place order");
+    }
   };
 
   return (
@@ -143,14 +191,12 @@ function CheckoutPage() {
           <div className="checkout-summary">
             <h3>Your order</h3>
 
-            {cart.map(item => (
+            {cart.map((item) => (
               <div key={item.id} className="summary-item">
                 <span>
                   {item.name} × {item.quantity}
                 </span>
-                <span>
-                  {(item.price * item.quantity).toFixed(2)} ₴
-                </span>
+                <span>{(item.price * item.quantity).toFixed(2)} ₴</span>
               </div>
             ))}
 

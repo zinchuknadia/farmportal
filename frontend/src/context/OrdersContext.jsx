@@ -1,29 +1,41 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "./AuthContext";
 
 const OrdersContext = createContext();
 
-const initialState =
-  JSON.parse(localStorage.getItem("orders")) || [];
-
-const ordersReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD_ORDER":
-      return [...state, action.payload];
-
-    default:
-      return state;
-  }
-};
-
 export const OrdersProvider = ({ children }) => {
-  const [orders, dispatch] = useReducer(ordersReducer, initialState);
+  const { user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem("orders", JSON.stringify(orders));
-  }, [orders]);
+    if (!user) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "orders"),
+      where("userId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setOrders(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   return (
-    <OrdersContext.Provider value={{ orders, dispatch }}>
+    <OrdersContext.Provider value={{ orders, loading }}>
       {children}
     </OrdersContext.Provider>
   );

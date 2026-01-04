@@ -129,3 +129,54 @@
   display: flex;
   justify-content: space-between;
 }
+
+.profile-details input {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.profile-details button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background-color: #27ae60;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.profile-details .secondary-btn {
+  margin-left: 10px;
+  background-color: #ddd;
+  color: #333;
+}
+
+.orders-section-title {
+  margin: 24px 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.order-card.active {
+  border-left: 4px solid #4caf50;
+}
+
+.order-card.history {
+  opacity: 0.85;
+}
+
+.order-status.pending { color: orange; }
+.order-status.processing { color: blue; }
+.order-status.delivered { color: green; }
+.order-status.cancelled { color: gray; }
+
+.empty-text {
+  margin-bottom: 16px;
+  color: #777;
+}

@@ -4,17 +4,73 @@ import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useOrders } from "../context/OrdersContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
+import { useProducts } from "../context/ProductsContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../styles/ProfilePage.css";
 
 function ProfilePage() {
+  const { products, loading: productsLoading } = useProducts();
   const { liked, saved } = useUserPreferences();
   const [activeTab, setActiveTab] = useState("orders");
   const { orders } = useOrders();
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const likedProducts = products.filter((p) => liked.includes(p.id));
+
+  const savedProducts = products.filter((p) => saved.includes(p.id));
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name || "",
+        phone: profile.phone || "",
+        address: profile.address || "",
+      });
+    }
+  }, [profile]);
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+
+    setSaving(true);
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        name: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+      });
+
+      setProfile((prev) => ({
+        ...prev,
+        ...formData,
+      }));
+
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -38,8 +94,37 @@ function ProfilePage() {
   }, [user]);
 
   const renderTabContent = () => {
+    const now = new Date();
+
+    // Compute a "displayStatus" for each order based on date + status
+    const ordersWithDisplayStatus = orders.map((order) => {
+      const deliveryDate = new Date(order.delivery.date);
+      let displayStatus = order.status;
+
+      // If order is still pending but date has passed, mark as delivered
+      if (order.status === "pending" && deliveryDate < now) {
+        displayStatus = "delivered";
+      }
+
+      return { ...order, displayStatus, deliveryDateObj: deliveryDate };
+    });
+
+    // Sort by delivery date ascending
+    ordersWithDisplayStatus.sort(
+      (a, b) => a.deliveryDateObj - b.deliveryDateObj
+    );
+
+    // Split into active and history
+    const activeOrders = ordersWithDisplayStatus.filter((o) =>
+      ["pending", "processing", "out_for_delivery"].includes(o.displayStatus)
+    );
+
+    const historyOrders = ordersWithDisplayStatus.filter((o) =>
+      ["delivered", "cancelled"].includes(o.displayStatus)
+    );
+
     switch (activeTab) {
-      case "orders":
+      case "orders": {
         if (orders.length === 0) {
           return (
             <div className="tab-content">
@@ -50,66 +135,84 @@ function ProfilePage() {
 
         return (
           <div className="orders-list">
-            {orders.map((order) => (
-              <div key={order.id} className="order-card">
-                <div className="order-header">
-                  <span>Order #{order.id.slice(0, 8)}</span>
-                  <span className="order-status">{order.status}</span>
-                </div>
+            {/* ACTIVE ORDERS */}
+            <h3 className="orders-section-title">Active orders</h3>
 
-                <div className="order-items">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="order-item">
-                      <span>
-                        {item.name} × {item.quantity} {item.unit}
-                      </span>
-                      <span>{(item.price * item.quantity).toFixed(2)} ₴</span>
-                    </div>
-                  ))}
-                </div>
+            {activeOrders.length === 0 ? (
+              <p className="empty-text">No active orders.</p>
+            ) : (
+              activeOrders.map((order) => (
+                <div key={order.id} className="order-card active">
+                  <div className="order-header">
+                    <span>Order #{order.id.slice(0, 8)}</span>
+                    <span className={`order-status ${order.displayStatus}`}>
+                      {order.displayStatus}
+                    </span>
+                  </div>
 
-                <div className="order-footer">
-                  <span>Delivery date: {order.delivery.date}</span>
-                  <strong>Total: {order.total.toFixed(2)} ₴</strong>
+                  <div className="order-items">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="order-item">
+                        <span>
+                          {item.name} × {item.quantity} {item.unit}
+                        </span>
+                        <span>{(item.price * item.quantity).toFixed(2)} ₴</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="order-footer">
+                    <span>Delivery date: {order.delivery.date}</span>
+                    <strong>Total: {order.total.toFixed(2)} ₴</strong>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
+
+            {/* ORDER HISTORY */}
+            <h3 className="orders-section-title">Order history</h3>
+
+            {historyOrders.length === 0 ? (
+              <p className="empty-text">No completed orders yet.</p>
+            ) : (
+              historyOrders.map((order) => (
+                <div key={order.id} className="order-card history">
+                  <div className="order-header">
+                    <span>Order #{order.id.slice(0, 8)}</span>
+                    <span className={`order-status ${order.displayStatus}`}>
+                      {order.displayStatus}
+                    </span>
+                  </div>
+
+                  <div className="order-items">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="order-item">
+                        <span>
+                          {item.name} × {item.quantity} {item.unit}
+                        </span>
+                        <span>{(item.price * item.quantity).toFixed(2)} ₴</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="order-footer">
+                    <span>Delivered on: {order.delivery.date}</span>
+                    <strong>Total: {order.total.toFixed(2)} ₴</strong>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         );
+      }
 
-      case "preorders":
-        const preorderItems = orders.flatMap((order) =>
-          order.items.filter((item) => item.preorder)
-        );
-
-        if (preorderItems.length === 0) {
-          return (
-            <div className="tab-content">
-              <p>No scheduled or preorder items.</p>
-            </div>
-          );
-        }
-
-        return (
-          <div className="orders-list">
-            {preorderItems.map((item) => (
-              <div key={item.id} className="order-card">
-                <p>
-                  🌱 {item.name} – ready on {item.deliveryDate}
-                </p>
-              </div>
-            ))}
-          </div>
-        );
-
+      // Keep favorites/saved unchanged
       case "favorites":
-        if (liked.length === 0) {
+        if (liked.length === 0)
           return <div className="tab-content">No liked products yet.</div>;
-        }
-
         return (
           <div className="orders-list">
-            {liked.map((product) => (
+            {likedProducts.map((product) => (
               <div key={product.id} className="order-card">
                 <strong>{product.name}</strong>
                 <p>
@@ -121,18 +224,16 @@ function ProfilePage() {
         );
 
       case "saved":
-        if (saved.length === 0) {
+        if (saved.length === 0)
           return <div className="tab-content">No saved products.</div>;
-        }
-
         return (
           <div className="orders-list">
-            {saved.map((product) => (
+            {savedProducts.map((product) => (
               <div key={product.id} className="order-card">
                 <strong>{product.name}</strong>
-                {product.preorder && (
-                  <p>🌱 Available from {product.availableFrom}</p>
-                )}
+                <p>
+                  {product.price} ₴ / {product.unit}
+                </p>
               </div>
             ))}
           </div>
@@ -157,15 +258,60 @@ function ProfilePage() {
           <div className="profile-details">
             {loadingProfile ? (
               <p>Loading profile...</p>
-            ) : profile ? (
-              <>
-                <h2>{profile.name || "Unnamed user"}</h2>
-                <p>Email: {profile.email}</p>
-                <p>Phone: {profile.phone || "Not provided"}</p>
-                <p>Delivery address: {profile.address || "Not provided"}</p>
-              </>
             ) : (
-              <p>No profile data found.</p>
+              <>
+                {isEditing ? (
+                  <>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
+
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Phone number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Delivery address"
+                      value={formData.address}
+                      onChange={handleChange}
+                    />
+
+                    <p>Email: {profile.email}</p>
+
+                    <button onClick={handleSave} disabled={saving}>
+                      {saving ? "Saving..." : "Save"}
+                    </button>
+
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="secondary-btn"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h2>{profile.name || "Unnamed user"}</h2>
+                    <p>Email: {profile.email}</p>
+                    <p>Phone: {profile.phone || "Not provided"}</p>
+                    <p>Delivery address: {profile.address || "Not provided"}</p>
+
+                    <button onClick={() => setIsEditing(true)}>
+                      Edit profile
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -177,12 +323,6 @@ function ProfilePage() {
             onClick={() => setActiveTab("orders")}
           >
             Order history
-          </button>
-          <button
-            className={activeTab === "preorders" ? "active" : ""}
-            onClick={() => setActiveTab("preorders")}
-          >
-            Preorders
           </button>
           <button
             className={activeTab === "favorites" ? "active" : ""}

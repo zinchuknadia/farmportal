@@ -1,56 +1,83 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import "../styles/ProductCard.css";
+import { arrayUnion, arrayRemove, updateDoc, doc } from "firebase/firestore";
+import { db } from "../firebase";
 
 function ProductCard({ product }) {
   const { dispatch: cartDispatch } = useCart();
-  const {
-    dispatch: prefDispatch,
-    liked,
-    saved
-  } = useUserPreferences();
+  const { user } = useAuth();
+  const { dispatch: prefDispatch, liked, saved } = useUserPreferences();
 
-  const isLiked = liked.some(p => p.id === product.id);
-  const isSaved = saved.some(p => p.id === product.id);
+  const isLiked = liked.some((p) => p.id === product.id);
+  const isSaved = saved.some((p) => p.id === product.id);
+
+  const toggleLike = async () => {
+    // 1️⃣ Update UI immediately
+    prefDispatch({
+      type: isLiked ? "REMOVE_LIKE" : "ADD_LIKE",
+      payload: product,
+    });
+
+    // 2️⃣ Persist to Firestore
+    if (!user) return;
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        liked: isLiked
+          ? arrayRemove(product.id)
+          : arrayUnion(product.id),
+      });
+    } catch (err) {
+      console.error("Failed to update likes:", err);
+      // (optional) rollback here
+    }
+  };
+
+  const toggleSave = async () => {
+    prefDispatch({
+      type: isSaved ? "REMOVE_SAVE" : "ADD_SAVE",
+      payload: product,
+    });
+
+    if (!user) return;
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        saved: isSaved
+          ? arrayRemove(product.id)
+          : arrayUnion(product.id),
+      });
+    } catch (err) {
+      console.error("Failed to update saved:", err);
+    }
+  };
 
   const addToCart = () => {
     cartDispatch({
       type: "ADD_ITEM",
-      payload: {
-        ...product,
-        quantity: 1,
-      },
+      payload: { ...product, quantity: 1 },
     });
   };
 
   return (
-     <div className="product-card">
+    <div className="product-card">
       <div className="product-card__icons">
-      <button
-        className={isLiked ? "active" : ""}
-        onClick={() =>
-          prefDispatch({
-            type: isLiked ? "REMOVE_LIKE" : "ADD_LIKE",
-            payload: isLiked ? product.id : product
-          })
-        }
-      >
-        ❤️
-      </button>
+        <button
+          className={isLiked ? "active" : ""}
+          onClick={toggleLike}
+        >
+          ❤️
+        </button>
 
-      <button
-        className={isSaved ? "active" : ""}
-        onClick={() =>
-          prefDispatch({
-            type: isSaved ? "REMOVE_SAVE" : "ADD_SAVE",
-            payload: isSaved ? product.id : product
-          })
-        }
-      >
-        🔖
-      </button>
-
+        <button
+          className={isSaved ? "active" : ""}
+          onClick={toggleSave}
+        >
+          🔖
+        </button>
       </div>
 
       <img
@@ -72,10 +99,7 @@ function ProductCard({ product }) {
         {product.price} ₴ / {product.unit}
       </span>
 
-      <button
-        className="add-to-cart-btn"
-        onClick={addToCart}
-      >
+      <button className="add-to-cart-btn" onClick={addToCart}>
         🛒 Add to cart
       </button>
     </div>
