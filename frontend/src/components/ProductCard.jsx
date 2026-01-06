@@ -1,14 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { arrayUnion, arrayRemove, updateDoc, doc } from "firebase/firestore";
+import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import "../styles/ProductCard.css";
-import { arrayUnion, arrayRemove, updateDoc, doc } from "firebase/firestore";
-import { db } from "../firebase";
 
 function ProductCard({ product }) {
   const { dispatch: cartDispatch } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { dispatch: prefDispatch, liked, saved } = useUserPreferences();
 
   const isLiked = liked.includes(product.id);
@@ -52,6 +54,13 @@ function ProductCard({ product }) {
   };
 
   const addToCart = () => {
+    if (!user) {
+      navigate("/signin", {
+        state: { from: `/products?focus=${product.id}` },
+      });
+      return;
+    }
+
     cartDispatch({
       type: "ADD_ITEM",
       payload: { ...product, quantity: 1 },
@@ -90,7 +99,7 @@ function ProductCard({ product }) {
       </span>
 
       <button className="add-to-cart-btn" onClick={addToCart}>
-        🛒 Add to cart
+        🛒 {user ? "Add to cart" : "Sign in to buy"}
       </button>
     </div>
   );

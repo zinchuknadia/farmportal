@@ -13,23 +13,23 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-color: rgba(0,0,0,0.45);
+  background-color: rgba(0, 0, 0, 0.45);
 }
 
 .hero__content {
   position: relative;
   z-index: 1;
-  max-width: 700px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .hero h1 {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   margin-bottom: 15px;
 }
 
 .hero p {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   margin-bottom: 25px;
   line-height: 1.6;
 }
@@ -38,7 +38,8 @@
   background-color: #5c9e61;
   color: white;
   border: none;
-  padding: 12px 28px;
+  text-decoration: none;
+  padding: 12px 30px;
   border-radius: 30px;
   font-size: 1rem;
   font-weight: 600;
@@ -53,74 +54,189 @@
 /* === About section === */
 .about {
   text-align: center;
-  padding: 60px 20px;
+  padding: 70px 20px;
   background-color: #f4f8f1;
   color: #2f5d31;
 }
 
 .about h2 {
-  font-size: 2rem;
+  font-size: 2.1rem;
   margin-bottom: 15px;
 }
 
 .about p {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0 auto;
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
+/* === Benefits === */
+.benefits {
+  padding: 70px 20px;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.benefits h2 {
+  font-size: 2.1rem;
+  color: #2f5d31;
+  margin-bottom: 40px;
+}
+
+.benefits__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.benefit-card {
+  background-color: #f4f8f1;
+  border-radius: 16px;
+  padding: 30px 20px;
+}
+
+.benefit-card span {
+  font-size: 2.5rem;
+}
+
+.benefit-card h3 {
+  margin: 15px 0 10px;
+  color: #2f5d31;
+}
+
+.benefit-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 /* === Products preview === */
 .products-preview {
-  padding: 60px 20px;
+  padding: 70px 20px;
   text-align: center;
 }
 
 .products-preview h2 {
-  font-size: 2rem;
+  font-size: 2.1rem;
   color: #2f5d31;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
+/* 🔑 GRID instead of flex */
 .products__grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 25px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .product-card {
-  background-color: #fff;
-  border-radius: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  width: 260px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .product-card img {
   width: 100%;
-  height: 180px;
+  height: 190px;
   object-fit: cover;
 }
 
 .product-card h3 {
   color: #2f5d31;
-  padding: 15px 10px;
+  padding: 18px 12px;
   font-size: 1.1rem;
 }
 
+/* === How it works === */
+.how-it-works {
+  padding: 70px 20px;
+  background-color: #f4f8f1;
+  text-align: center;
+}
+
+.how-it-works h2 {
+  font-size: 2.1rem;
+  color: #2f5d31;
+  margin-bottom: 40px;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.step {
+  max-width: 200px;
+}
+
+.step span {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  background-color: #5c9e61;
+  color: white;
+  border-radius: 50%;
+  line-height: 42px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.cta {
+  background-image: url("https://cdn.pixabay.com/photo/2017/08/07/20/46/wheat-2605043_1280.jpg");
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 100px 20px;
+  position: relative;
+}
+
+.cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(47, 93, 49, 0.6);
+}
+
+.cta * {
+  position: relative;
+  z-index: 1;
+}
+
+.cta__button {
+  display: inline-block;
+  background-color: #5c9e61;
+  color: #ffffff;
+  text-decoration: none;
+  border: none;
+  padding: 14px 34px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta__button:hover {
+  background-color: #4b8b52;
+}
+
+/* === Responsive === */
 @media (max-width: 768px) {
   .hero h1 {
-    font-size: 2rem;
-  }
-  .products__grid {
-    flex-direction: column;
-    align-items: center;
+    font-size: 2.1rem;
   }
 }
