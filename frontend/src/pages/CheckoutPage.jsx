@@ -14,6 +14,8 @@ function CheckoutPage() {
   const { user } = useAuth();
   const { cart, dispatch: cartDispatch } = useCart();
   const { dispatch: ordersDispatch } = useOrders();
+  const [errors, setErrors] = useState([]);
+  const [success, setSuccess] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -70,15 +72,23 @@ function CheckoutPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user) {
-      alert("Please log in to place an order");
+    const newErrors = [];
+
+    if (!form.name) newErrors.push("Please enter your full name");
+    if (!form.phone) newErrors.push("Please enter a phone number");
+    if (!form.deliveryDate) newErrors.push("Please select a delivery date");
+    if (form.deliveryType === "delivery" && !form.address) {
+      newErrors.push("Please provide a delivery address");
+    }
+
+    if (!user) newErrors.push("Please log in to place an order");
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    if (!form.name || !form.phone || !form.deliveryDate) {
-      alert("Please fill all required fields");
-      return;
-    }
+    setErrors([]); // clear old errors
 
     const order = {
       userId: user.uid,
@@ -102,11 +112,15 @@ function CheckoutPage() {
       await addDoc(collection(db, "orders"), order);
 
       cartDispatch({ type: "CLEAR_CART" });
-      alert("Order confirmed 🌱");
-      window.location.href = "/profile";
+      setSuccess("Your order has been placed successfully! 🌱");
+      setErrors([]);
+
+      setTimeout(() => {
+        window.location.href = "/profile";
+      }, 1500);
     } catch (err) {
       console.error("Failed to save order:", err);
-      alert("Failed to place order");
+      setErrors(["Failed to place order"]);
     }
   };
 
@@ -121,6 +135,15 @@ function CheckoutPage() {
           {/* FORM */}
           <form className="checkout-form" onSubmit={handleSubmit}>
             <h2>Your details</h2>
+
+            {success && <div className="success-box">{success}</div>}
+            {errors.length > 0 && (
+              <div className="error-box">
+                {errors.map((err, i) => (
+                  <p key={i}>{err}</p>
+                ))}
+              </div>
+            )}
 
             <input
               type="text"

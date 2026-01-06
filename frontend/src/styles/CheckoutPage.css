@@ -87,3 +87,29 @@
     flex-direction: column;
   }
 }
+
+/* Error box */
+.error-box {
+  background: #ffe3e3;
+  border-left: 4px solid #ff6b6b;
+  color: #b30000;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.error-box p {
+  margin: 4px 0;
+}
+
+.success-box {
+  background: #e2f7e8;
+  border-left: 4px solid #27ae60;
+  color: #1b5e20;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
