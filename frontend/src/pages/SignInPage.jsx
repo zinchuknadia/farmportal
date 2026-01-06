@@ -16,6 +16,17 @@ function SignIn() {
   const signin = async () => {
     setError("");
 
+    // 🔒 frontend validation
+    if (!email.trim()) {
+      setError("Email is required.");
+      return;
+    }
+
+    if (!password.trim()) {
+      setError("Password is required.");
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/profile");
@@ -24,6 +35,8 @@ function SignIn() {
         setError("No account found with this email.");
       } else if (err.code === "auth/wrong-password") {
         setError("Wrong password.");
+      } else if (err.code === "auth/invalid-email") {
+        setError("Invalid email format.");
       } else {
         setError("Something went wrong. Please try again.");
       }
@@ -44,14 +57,14 @@ function SignIn() {
 
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email *"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password *"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
