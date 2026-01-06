@@ -15,7 +15,9 @@ function Header() {
 
   return (
     <header className="header">
-      <div className="header__logo">🌾 GreenFarm</div>
+      <div className="header__logo">
+        <Link to="/">🌾 GreenFarm</Link>
+      </div>
 
       <nav className="header__nav">
         <ul>

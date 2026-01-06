@@ -108,3 +108,16 @@
   cursor: pointer;
   font-weight: 500;
 }
+
+.header__logo a {
+  text-decoration: none;    /* remove underline */
+  color: inherit;           /* keep same green/dark color */
+  font-weight: inherit;     /* match logo font weight */
+  font-size: inherit;       /* inherit size */
+  display: inline-block;
+}
+
+.header__logo a:hover {
+  opacity: 1;            /* tiny hover hint */
+  cursor: pointer;
+}
