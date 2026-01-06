@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
@@ -213,12 +214,16 @@ function ProfilePage() {
         return (
           <div className="orders-list">
             {likedProducts.map((product) => (
-              <div key={product.id} className="order-card">
+              <Link
+                key={product.id}
+                to={`/products?focus=${product.id}`}
+                className="order-card product-link"
+              >
                 <strong>{product.name}</strong>
                 <p>
                   {product.price} ₴ / {product.unit}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         );
@@ -229,12 +234,16 @@ function ProfilePage() {
         return (
           <div className="orders-list">
             {savedProducts.map((product) => (
-              <div key={product.id} className="order-card">
+              <Link
+                key={product.id}
+                to={`/products?focus=${product.id}`}
+                className="order-card product-link"
+              >
                 <strong>{product.name}</strong>
                 <p>
                   {product.price} ₴ / {product.unit}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         );

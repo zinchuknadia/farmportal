@@ -4,16 +4,16 @@ import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 
 import Header from "../components/Header";
-import "../styles/LoginSignup.css";
+import "../styles/SigninSignup.css";
 
-function LogIn() {
+function SignIn() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const login = async () => {
+  const signin = async () => {
     setError("");
 
     try {
@@ -37,8 +37,8 @@ function LogIn() {
 
       <div className="auth-container">
         <div className="form-box">
-          <h2>Login</h2>
-          <p>Log in to your account</p>
+          <h2>Sign In</h2>
+          <p>Sign in to your account</p>
 
           {error && <p className="error-text">{error}</p>}
 
@@ -56,7 +56,7 @@ function LogIn() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button onClick={login}>Login</button>
+          <button onClick={signin}>Sign In</button>
 
           <p className="switch-link">
             No account? <Link to="/signup">Sign up</Link>
@@ -67,4 +67,4 @@ function LogIn() {
   );
 }
 
-export default LogIn;
+export default SignIn;

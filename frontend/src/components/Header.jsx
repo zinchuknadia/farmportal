@@ -45,7 +45,7 @@ function Header() {
       <div className="header__actions">
         {!user ? (
           <>
-            <Link to="/login" className="nav__link">
+            <Link to="/signin" className="nav__link">
               Sign in
             </Link>
             <Link to="/signup">

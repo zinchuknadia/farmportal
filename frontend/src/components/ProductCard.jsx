@@ -11,14 +11,14 @@ function ProductCard({ product }) {
   const { user } = useAuth();
   const { dispatch: prefDispatch, liked, saved } = useUserPreferences();
 
-  const isLiked = liked.some((p) => p.id === product.id);
-  const isSaved = saved.some((p) => p.id === product.id);
+  const isLiked = liked.includes(product.id);
+  const isSaved = saved.includes(product.id);
 
   const toggleLike = async () => {
     // 1️⃣ Update UI immediately
     prefDispatch({
       type: isLiked ? "REMOVE_LIKE" : "ADD_LIKE",
-      payload: product,
+      payload: product.id,
     });
 
     // 2️⃣ Persist to Firestore
@@ -26,9 +26,7 @@ function ProductCard({ product }) {
 
     try {
       await updateDoc(doc(db, "users", user.uid), {
-        liked: isLiked
-          ? arrayRemove(product.id)
-          : arrayUnion(product.id),
+        liked: isLiked ? arrayRemove(product.id) : arrayUnion(product.id),
       });
     } catch (err) {
       console.error("Failed to update likes:", err);
@@ -39,16 +37,14 @@ function ProductCard({ product }) {
   const toggleSave = async () => {
     prefDispatch({
       type: isSaved ? "REMOVE_SAVE" : "ADD_SAVE",
-      payload: product,
+      payload: product.id,
     });
 
     if (!user) return;
 
     try {
       await updateDoc(doc(db, "users", user.uid), {
-        saved: isSaved
-          ? arrayRemove(product.id)
-          : arrayUnion(product.id),
+        saved: isSaved ? arrayRemove(product.id) : arrayUnion(product.id),
       });
     } catch (err) {
       console.error("Failed to update saved:", err);
@@ -65,17 +61,11 @@ function ProductCard({ product }) {
   return (
     <div className="product-card">
       <div className="product-card__icons">
-        <button
-          className={isLiked ? "active" : ""}
-          onClick={toggleLike}
-        >
+        <button className={isLiked ? "active" : ""} onClick={toggleLike}>
           ❤️
         </button>
 
-        <button
-          className={isSaved ? "active" : ""}
-          onClick={toggleSave}
-        >
+        <button className={isSaved ? "active" : ""} onClick={toggleSave}>
           🔖
         </button>
       </div>

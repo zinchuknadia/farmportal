@@ -13,14 +13,14 @@ import ProductsPage from "./pages/ProductsPage";
 import ProfilePage from "./pages/ProfilePage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
-import LogIn from "./pages/LogInPage";
+import SignIn from "./pages/SignInPage";
 import SignUp from "./pages/SignUpPage";
 
 function App() {
   return (
     <AuthProvider>
-      <ProductsProvider>
-        <UserPreferencesProvider>
+      <UserPreferencesProvider>
+        <ProductsProvider>
           <CartProvider>
             <OrdersProvider>
               <UserProvider>
@@ -33,16 +33,16 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/SignUp" element={<SignUp />} />
-                    <Route path="/LogIn" element={<LogIn />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/signin" element={<SignIn />} />
                     <Route path="/user/:id" element={<ProfilePage />} />
                   </Routes>
                 </Router>
               </UserProvider>
             </OrdersProvider>
           </CartProvider>
-        </UserPreferencesProvider>
-      </ProductsProvider>
+        </ProductsProvider>
+      </UserPreferencesProvider>
     </AuthProvider>
   );
 }

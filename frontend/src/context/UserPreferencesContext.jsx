@@ -1,9 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "./AuthContext";
@@ -13,7 +8,6 @@ const UserPreferencesContext = createContext();
 const initialState = {
   liked: [],
   saved: [],
-  loading: true,
 };
 
 function reducer(state, action) {
@@ -24,11 +18,32 @@ function reducer(state, action) {
     case "SET_SAVED":
       return { ...state, saved: action.payload };
 
-    case "RESET":
-      return { ...initialState, loading: false };
+    case "ADD_LIKE":
+      return {
+        ...state,
+        liked: [...state.liked, action.payload],
+      };
 
-    case "DONE_LOADING":
-      return { ...state, loading: false };
+    case "REMOVE_LIKE":
+      return {
+        ...state,
+        liked: state.liked.filter((id) => id !== action.payload),
+      };
+
+    case "ADD_SAVE":
+      return {
+        ...state,
+        saved: [...state.saved, action.payload],
+      };
+
+    case "REMOVE_SAVE":
+      return {
+        ...state,
+        saved: state.saved.filter((id) => id !== action.payload),
+      };
+
+    case "RESET":
+      return initialState;
 
     default:
       return state;
@@ -72,13 +87,10 @@ export function UserPreferencesProvider({ children }) {
   }, [user]);
 
   return (
-    <UserPreferencesContext.Provider
-      value={{ ...state, dispatch }}
-    >
+    <UserPreferencesContext.Provider value={{ ...state, dispatch }}>
       {children}
     </UserPreferencesContext.Provider>
   );
 }
 
-export const useUserPreferences = () =>
-  useContext(UserPreferencesContext);
+export const useUserPreferences = () => useContext(UserPreferencesContext);

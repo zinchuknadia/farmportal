@@ -5,7 +5,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
-import "../styles/LoginSignup.css";
+import "../styles/SigninSignup.css";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -75,7 +75,7 @@ function SignUp() {
           <button onClick={signUp}>Sign Up</button>
 
           <p className="switch-link">
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account? <Link to="/signin">Sign in</Link>
           </p>
         </div>
       </div>
