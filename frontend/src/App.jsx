@@ -15,6 +15,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SignIn from "./pages/SignInPage";
 import SignUp from "./pages/SignUpPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <OrdersProvider>
               <UserProvider>
                 <Router>
+                  <ScrollToTop />
                   <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/about" element={<AboutPage />} />
