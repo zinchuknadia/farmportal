@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs, query, limit, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
+import { useAuth } from "../context/AuthContext";
 import { useProducts } from "../context/ProductsContext";
 import "../styles/HomePage.css";
 import "../styles/index.css";
 
 function HomePage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
   const { products, loading } = useProducts();
 
-  const previewProducts = products.slice(0, 4);
+  const previewProducts = products.slice(0, 3);
 
   return (
     <>
@@ -86,15 +90,25 @@ function HomePage() {
           <h2>How It Works</h2>
 
           <div className="steps">
-            <div className="step">
+            <div className="step" onClick={() => navigate("/products")}>
               <span>1</span>
               <p>Choose fresh farm products</p>
             </div>
-            <div className="step">
+
+            <div
+              className="step"
+              onClick={() => (user ? navigate("/cart") : navigate("/signin"))}
+            >
               <span>2</span>
               <p>Place your order online</p>
             </div>
-            <div className="step">
+
+            <div
+              className="step"
+              onClick={() =>
+                user ? navigate("/profile") : navigate("/signin")
+              }
+            >
               <span>3</span>
               <p>We harvest & deliver to you</p>
             </div>
