@@ -1,24 +1,22 @@
-// backend/server.js
-const express = require('express');
-// const cors = require('cors'); // to allow requests from frontend
+import express from "express";  // if using ES modules (package.json type: "module")
+import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Middleware
-// app.use(cors());
-app.use(express.json());
+// middlewares
+app.use(cors());
+app.use(express.json()); // parse JSON bodies
 
-// Example route
-app.get('/api/products', (req, res) => {
-  res.json([
-    { id: 1, name: 'Organic Apples', price: 3.5 },
-    { id: 2, name: 'Fresh Milk', price: 2.0 },
-    { id: 3, name: 'Honey', price: 5.0 }
-  ]);
+// simple test route
+app.get("/", (req, res) => {
+  res.send("Hello from GreenFarm backend 🌱");
 });
 
-// Start server
+// start server
 app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
